@@ -180,3 +180,4 @@ cython_debug/
 /model_repository/**/*.onnx
 /model_repository/**/*.pt
 /model_repository/**/*.dali
+clearml.conf
