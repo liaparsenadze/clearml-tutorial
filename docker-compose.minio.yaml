@@ -1,4 +1,3 @@
-include: [docker-compose.yaml]
 services:
   minio:
     networks:

@@ -1,0 +1,23 @@
+services:
+  clearml-agent:
+    networks:
+      - backend
+    container_name: clearml-agent
+    image: python:3.12
+    depends_on:
+      - apiserver
+    restart: unless-stopped
+    environment:
+      CLEARML_WORKER_ID: clearml-agent
+      CLEARML_API_HOST: http://apiserver:8008
+      CLEARML_WEB_HOST: http://localhost:8080
+      CLEARML_FILES_HOST: http://fileserver:8081
+      CLEARML_API_ACCESS_KEY: ${CLEARML_AGENT_ACCESS_KEY}
+      CLEARML_API_SECRET_KEY: ${CLEARML_AGENT_SECRET_KEY}
+      CLEARML_AGENT_GIT_USER: ${CLEARML_AGENT_GIT_USER}
+      CLEARML_AGENT_GIT_PASS: ${CLEARML_AGENT_GIT_PASS}
+      MINIO_AGENT_KEY: ${MINIO_AGENT_KEY}
+      MINIO_AGENT_SECRET: ${MINIO_AGENT_SECRET}
+    volumes:
+      - ./deploy-clearml.conf:/root/clearml.conf
+    command: sh -c "pip install clearml-agent && clearml-agent daemon --queue default"
