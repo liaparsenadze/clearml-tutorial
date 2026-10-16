@@ -1,3 +1,4 @@
 {
-  "preprocess": "some-preprocess-param"
+  "dataset_id": "some-id",
+  "dataset_name": "same-name"
 }
