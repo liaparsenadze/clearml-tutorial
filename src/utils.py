@@ -23,8 +23,10 @@ def setup_task(
     project_name: str | None,
     task_name: str | None,
     config_path: Path | None,
-    queue_name: str | None):
-    task = Task.init(project_name=project_name, task_name=task_name, task_type=Task.TaskTypes.data_processing)
+    queue_name: str | None,
+    task_type=Task.TaskTypes.training
+) -> Task:
+    task = Task.init(project_name=project_name, task_name=task_name, task_type=task_type)
     config = task.connect_configuration(load_config(config_path), name='config') if config_path else None
     if queue_name:
         task.execute_remotely(queue_name=queue_name, exit_process=True)

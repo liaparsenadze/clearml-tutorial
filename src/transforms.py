@@ -11,3 +11,4 @@ def load_idx_images(path: Path) -> np.ndarray:
 def load_idx_labels(path: Path) -> np.ndarray:
     # IDX label file: 8-byte header, then one uint8 label per image
     return np.frombuffer(path.read_bytes(), dtype=np.uint8, offset=8)
+

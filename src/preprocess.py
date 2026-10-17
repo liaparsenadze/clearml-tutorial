@@ -4,11 +4,11 @@ import numpy as np
 from transforms import load_idx_images, load_idx_labels
 from utils import setup_task, parse_arguments
 from pathlib import Path
-from clearml import Dataset
+from clearml import Dataset, Task
 
 
 def main(project_name, task_name, config_path, queue_name):
-    task, config = setup_task(project_name, task_name, config_path, queue_name)
+    task, config = setup_task(project_name, task_name, config_path, queue_name, Task.TaskTypes.data_processing)
     raw_id = config['dataset_id']
     raw = Path(Dataset.get(dataset_id=raw_id).get_local_copy())
 

@@ -1,11 +1,5 @@
-import torch
 import torch.nn.functional as F
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-from torch import optim
 from torch import nn
-from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 class CNN(nn.Module):
     def __init__(self, in_channels, n_classes):

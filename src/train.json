@@ -1,0 +1,7 @@
+{
+  "dataset_id": "e17055a4aeb9493cba17f8e49cc8d2dc",
+  "epochs": 2,
+  "lr": 0.001,
+  "mean": 0.2860,
+  "std": 0.3530
+}
