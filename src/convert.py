@@ -13,6 +13,8 @@ def parse_args():
     parser.add_argument("-m", "--model-name", type=str, required=True)
     args = parser.parse_args()
 
+
+
     return args.input_path, args.output_path, args.model_name
 
 

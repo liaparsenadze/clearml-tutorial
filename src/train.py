@@ -9,12 +9,12 @@ from model import CNN
 import json
 
 
-def normalize(img_tensor, label_tensor, mean, std):
+def normalize(img_tensor, mean, std, label_tensor=None):
     img_tensor = img_tensor.float() / 255.0
     img_tensor = (img_tensor - mean) / std
-
-    return img_tensor.unsqueeze(1), label_tensor.long()
-
+    if label_tensor:
+        return img_tensor.unsqueeze(1), label_tensor.long()
+    return img_tensor.unsqueeze(1)
 
 def train(project_name, task_name, config_path, queue_name):
     task, config = setup_task(project_name, task_name, config_path, queue_name)
@@ -32,7 +32,7 @@ def train(project_name, task_name, config_path, queue_name):
     for epoch in range(config['epochs']):
         _loss = 0
         for i, batch in enumerate(loader):
-            normed_batch = normalize(*batch, config['mean'], config['std'])
+            normed_batch = normalize(batch[0], config['mean'], config['std'], label_tensor=batch[1])
             opt.zero_grad()
             pred = model(normed_batch[0])
             loss = F.cross_entropy(pred, normed_batch[1])

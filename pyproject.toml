@@ -4,9 +4,12 @@ version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
     "clearml[s3]==2.0.2",
+    "gevent>=26.9.0",
+    "geventhttpclient>=2.6.1",
     "onnx>=1.23.2",
     "onnxscript>=0.7.2",
     "torch==2.10.0",
     "torchvision==0.25.0",
+    "tritonclient>=2.73.0",
 ]
 
