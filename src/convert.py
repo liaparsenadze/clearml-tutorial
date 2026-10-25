@@ -4,6 +4,10 @@ import torch
 from torch.export import Dim
 from pathlib import Path
 from model import CNN
+from pydantic import BaseModel
+from enum import StrEnum
+from google.protobuf import text_format, json_format
+from tritonclient.grpc.model_config_pb2 import ModelConfig
 
 
 def parse_args():
@@ -13,9 +17,25 @@ def parse_args():
     parser.add_argument("-m", "--model-name", type=str, required=True)
     args = parser.parse_args()
 
-
-
     return args.input_path, args.output_path, args.model_name
+
+
+class DataType(StrEnum):
+    FP32 = "TYPE_FP32"
+
+
+class _Dim(BaseModel):
+    name: str
+    dims: list[int]
+    data_type: DataType = DataType.FP32
+
+
+class FashionModelConfig(BaseModel):
+    name: str
+    backend: str = "onnxruntime"
+    max_batch_size: int = 32
+    input: list[_Dim]
+    output: list[_Dim]
 
 
 def convert(input_path, output_path, model_name):
@@ -44,9 +64,23 @@ def verify(onnx_path):
     onnx.checker.check_model(onnx_program)
 
 
+def generate_config(model_name, output_path):
+    config = FashionModelConfig(
+        name=model_name,
+        input=[_Dim(name='input', dims=[1,28,28])],
+        output=[_Dim(name='logits', dims=[10])]
+    )
+    pb = json_format.ParseDict(config.model_dump(), ModelConfig())
+    pbtxt = text_format.MessageToString(pb, use_short_repeated_primitives=True)
+
+    with open(output_path / f"{model_name}/config.pbtxt", "w") as f:
+        f.write(pbtxt)
+
+
 def main(input_path, output_path, model_name):
     onnx_path = convert(input_path, output_path, model_name)
     verify(onnx_path)
+    generate_config(model_name, output_path)
 
 
 if __name__ == '__main__':
