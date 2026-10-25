@@ -4,17 +4,13 @@ from torch.utils.data import DataLoader, TensorDataset
 from clearml import Dataset
 from pathlib import Path
 from utils import setup_task, parse_arguments
+from transforms import normalize
 import numpy as np
 from model import CNN
 import json
 
 
-def normalize(img_tensor, mean, std, label_tensor=None):
-    img_tensor = img_tensor.float() / 255.0
-    img_tensor = (img_tensor - mean) / std
-    if label_tensor:
-        return img_tensor.unsqueeze(1), label_tensor.long()
-    return img_tensor.unsqueeze(1)
+
 
 def train(project_name, task_name, config_path, queue_name):
     task, config = setup_task(project_name, task_name, config_path, queue_name)

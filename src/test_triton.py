@@ -1,6 +1,6 @@
 import tritonclient.http as httpclient
 from PIL import Image
-from train import normalize
+from  transforms import normalize
 import torch
 import numpy as np
 
