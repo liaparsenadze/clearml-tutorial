@@ -15,6 +15,6 @@ def load_idx_labels(path: Path) -> np.ndarray:
 def normalize(img_tensor, mean, std, label_tensor=None):
     img_tensor = img_tensor.float() / 255.0
     img_tensor = (img_tensor - mean) / std
-    if label_tensor:
+    if label_tensor is not None:
         return img_tensor.unsqueeze(1), label_tensor.long()
     return img_tensor.unsqueeze(1)

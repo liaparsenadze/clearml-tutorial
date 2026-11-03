@@ -27,5 +27,6 @@ def main(project_name, task_name, config_path, queue_name):
     dataset.upload()
     dataset.finalize()
 
+
 if __name__ == '__main__':
     main(*parse_arguments())
