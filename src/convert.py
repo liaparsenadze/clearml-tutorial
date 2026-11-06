@@ -24,6 +24,7 @@ def parse_args():
 class DataType(StrEnum):
     FP32 = "TYPE_FP32"
     UINT8 = "TYPE_UINT8"
+    INT64 = "TYPE_INT64"
 
 
 class _Dim(BaseModel):
@@ -79,6 +80,24 @@ def convert_model(input_path, output_path, model_name):
     return onnx_path
 
 
+def convert_postprocess_module(module, output_path, module_name):
+    module.eval()
+    example_input = torch.rand(1, 10)
+    onnx_program = torch.onnx.export(
+        module,
+        example_input,
+        dynamic_shapes={"x": {0: Dim("batch")}},
+        input_names=['logits'],
+        output_names=['class_id', 'conf']
+    )
+    model_dir = output_path / module_name / "1"
+    onnx_path = model_dir / "model.onnx"
+    model_dir.mkdir(parents=True, exist_ok=True)
+    onnx_program.save(onnx_path)
+
+    return onnx_path
+
+
 def verify(onnx_path):
     onnx_program = onnx.load(onnx_path)
     onnx.checker.check_model(onnx_program)
@@ -111,6 +130,19 @@ def generate_model_config(model_name, output_path):
         f.write(pbtxt)
 
 
+def generate_postprocess_config(module_name, output_path):
+    config = FashionModelConfig(
+        name=module_name,
+        input=[_Dim(name='logits', dims=[10])],
+        output=[_Dim(name='class_id', dims=[1], data_type=DataType.INT64), _Dim(name='conf', dims=[1])],
+    )
+    pb = json_format.ParseDict(config.model_dump(), ModelConfig())
+    pbtxt = text_format.MessageToString(pb, use_short_repeated_primitives=True)
+
+    with open(output_path / f"{module_name}/config.pbtxt", "w") as f:
+        f.write(pbtxt)
+
+
 def main(input_path, output_path, model_name):
     module_name = f"preprocess_{model_name}"
     onnx_path = convert_preprocess_module(Preprocess(mean=0.2860, std=0.3530), output_path, module_name)
@@ -121,7 +153,10 @@ def main(input_path, output_path, model_name):
     verify(onnx_path)
     generate_model_config(model_name, output_path)
 
-
+    module_name = f"postprocess_{model_name}"
+    onnx_path = convert_postprocess_module(Postprocess(), output_path, module_name)
+    verify(onnx_path)
+    generate_postprocess_config(module_name, output_path)
 
 
 if __name__ == '__main__':

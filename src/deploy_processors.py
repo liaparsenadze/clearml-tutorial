@@ -18,4 +18,6 @@ class Postprocess(nn.Module):
         super().__init__()
 
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        return torch.argmax(x, dim=1), torch.softmax(x, dim=1)
+        probs = torch.softmax(x, dim=1)
+        score, class_id = torch.max(probs, dim=1, keepdim=True)
+        return class_id, score
