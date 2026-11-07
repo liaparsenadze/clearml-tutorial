@@ -16,3 +16,13 @@ dependencies = [
     "tritonclient[grpc]>=2.73.0",
 ]
 
+[dependency-groups]
+dev = [
+    "onnxruntime<1.24",
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
