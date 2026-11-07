@@ -6,21 +6,21 @@ import numpy as np
 
 
 def infer_img(client, img_path):
-    img = Image.open(img_path)
-    img = normalize(torch.from_numpy(np.array(img)[None]), 0.286, 0.353).numpy()
+    img = np.array(Image.open(img_path))
+    img = img[None, None]
     input_tensor = httpclient.InferInput(
         "input",
         img.shape,
-        "FP32",
+        "UINT8",
     )
     input_tensor.set_data_from_numpy(img)
     resp = client.infer(
-        "fashion-v2",
+        "ensemble_fashion-v1",
         model_version='1',
         inputs=[input_tensor]
     )
 
-    return  np.argmax(resp.as_numpy("logits"))
+    return  resp.as_numpy('class_id'), resp.as_numpy('conf')
 
 
 if __name__ == '__main__':

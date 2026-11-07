@@ -68,4 +68,5 @@ def test_convert_postprocess_creates_correct_onnx_file(tmp_path):
         torch_cls, torch_conf = module(pred)
 
     np.testing.assert_allclose(onnx_cls, torch_cls.numpy(), rtol=1e-6, atol=1e-6)
-    np.testing.assert_allclose(onnx_cls, torch_cls.numpy(), rtol=1e-6, atol=1e-6)
+    np.testing.assert_allclose(onnx_conf, torch_conf.numpy(), rtol=1e-6, atol=1e-6)
+
