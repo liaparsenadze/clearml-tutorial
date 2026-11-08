@@ -31,12 +31,12 @@ class EnsembleConfig(BaseModel):
     ensemble_scheduling: dict[str, list[EnsembleStepConfig]]
 
 
-def generate_ensemble_config(model_name:str, output_path: Path):
+def generate_ensemble_config(clearml_model, metadata, output_path: Path):
     config = EnsembleConfig(
-        name=f"ensemble_{model_name}",
+        name=f"ensemble_{clearml_model.name}",
         platform="ensemble",
         max_batch_size=32,
-        input=[_Dim(name='input', dims=[1,28,28], data_type=DataType.UINT8)],
+        input=[_Dim(name='input', dims=metadata.input_shape, data_type=DataType.UINT8)],
         output=[
             _Dim(name='class_id', dims=[1], data_type=DataType.INT64),
             _Dim(name='conf', dims=[1])
@@ -44,19 +44,19 @@ def generate_ensemble_config(model_name:str, output_path: Path):
         ensemble_scheduling={
             "step": [
                 EnsembleStepConfig(
-                    model_name=f"preprocess_{model_name}",
+                    model_name=f"preprocess_{clearml_model.name}",
                     model_version=1,
                     input_map={"input": "input"},
                     output_map={"norm_input": "norm_input"},
                 ),
                 EnsembleStepConfig(
-                    model_name=f"{model_name}",
+                    model_name=f"{clearml_model.name}",
                     model_version=1,
                     input_map={"input": "norm_input"},
                     output_map={"logits": "logits"},
                 ),
                 EnsembleStepConfig(
-                    model_name=f"postprocess_{model_name}",
+                    model_name=f"postprocess_{clearml_model.name}",
                     model_version=1,
                     input_map={"logits": "logits"},
                     output_map={"class_id": "class_id", "conf": "conf"},
@@ -66,15 +66,7 @@ def generate_ensemble_config(model_name:str, output_path: Path):
     )
     pb = json_format.ParseDict(config.model_dump(), ModelConfig())
     pbtxt = text_format.MessageToString(pb, use_short_repeated_primitives=True)
-    (output_path / f"ensemble_{model_name}/1").mkdir(parents=True, exist_ok=True)
+    (output_path / f"ensemble_{clearml_model.name}/1").mkdir(parents=True, exist_ok=True)
 
-    with open(output_path / f"ensemble_{model_name}/config.pbtxt", "w") as f:
+    with open(output_path / f"ensemble_{clearml_model.name}/config.pbtxt", "w") as f:
         f.write(pbtxt)
-
-
-def main(model_name: str, output_path: Path):
-    generate_ensemble_config(model_name, output_path)
-
-
-if __name__ == "__main__":
-    main(*parse_args())

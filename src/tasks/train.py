@@ -10,8 +10,6 @@ from model import CNN
 import json
 
 
-
-
 def train(project_name, task_name, config_path, queue_name):
     task, config = setup_task(project_name, task_name, config_path, queue_name)
     dataset_id = config["dataset_id"]
