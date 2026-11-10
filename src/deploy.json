@@ -1,0 +1,5 @@
+{
+  "model_id": "123",
+  "name": "fashion-v1",
+  "input_shape": [1, 28, 28]
+}
