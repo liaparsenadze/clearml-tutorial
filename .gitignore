@@ -181,3 +181,5 @@ cython_debug/
 /model_repository/**/*.pt
 /model_repository/**/*.dali
 clearml.conf
+# local session notes
+HANDOFF.md

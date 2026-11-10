@@ -16,9 +16,24 @@ automatically, on a local Docker Compose stack (MinIO stands in for S3).
 | 6 | GitOps rollout | k3d + ArgoCD (or a Compose deployer) serves the new model; rollback = `git revert` | ⏳ |
 | 7 | Fully automatic | Publishing a model in ClearML triggers the pipeline | ⏳ |
 
+## Next (Phase 3)
+
+- [x] `src/deploy.py`: `model_id` → Triton model repository artifact (works locally)
+- [ ] ML image: Dockerfile with locked deps from `pyproject.toml` / `uv.lock` (fixes missing `tritonclient[grpc]` on the agent)
+- [ ] Agent in Docker mode; tasks pick their image via `task.set_base_docker(...)`
+- [ ] Run `deploy.py -q default` on the agent
+- [ ] Triton check step: fetch `model_repository`, start `tritonserver`, run the check, fail on error
+- [ ] Wire both steps into a `PipelineDecorator` pipeline
+- Later: local container registry (stand-in for ECR)
+
 ## Layout
 
-- `src/train.py`, `src/preprocess.py`: ClearML training tasks
-- `src/convert.py`: ONNX export + Triton configs; `src/triton_ensemble.py`: ensemble config
-- `src/test_triton.py`: manual Triton vs PyTorch check (needs a running Triton)
-- `tests/`: pytest (ONNX vs PyTorch)
+- `src/preprocess.py`, `src/train.py`: ClearML data and training tasks
+- `src/deploy.py`: ClearML deploy task (`model_id` → `model_repository` artifact)
+- `src/convert.py`: `ConvertSpec`, ONNX export + Triton configs; `src/triton_ensemble.py`: ensemble config
+- `tests/test_convert.py`: ONNX vs PyTorch; `tests/test_ensemble_triton.py`: Triton vs PyTorch (skips without Triton)
+
+## Running locally
+
+- Always `export CLEARML_CONFIG_FILE="$PWD/clearml.conf"` (otherwise `~/clearml.conf` is used)
+- `/etc/hosts` needs `127.0.0.1 minio`; `clearml.conf` uses `minio:9000`, same as the agent
