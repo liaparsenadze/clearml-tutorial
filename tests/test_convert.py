@@ -7,31 +7,30 @@ from deploy_processors import Preprocess, Postprocess
 from model import CNN
 
 
-def test_convert_model_creates_onnx_file(model_path, tmp_path):
-    onnx_path = c.convert_model(model_path, output_path=tmp_path, model_name="test_model")
+def test_convert_model_creates_onnx_file(convert_spec, model_path, tmp_path):
+    onnx_path = c.convert_model(model_path, convert_spec, output_path=tmp_path)
     assert onnx_path == tmp_path / "test_model" / "1" / "model.onnx"
     assert onnx_path.is_file()
 
 
-
 @pytest.mark.parametrize(
-    "fn, module_name, module",
+    "fn, module_name",
     [
-        (c.convert_preprocess_module, "pre", Preprocess(mean=0.2860, std=0.3530)),
-        (c.convert_postprocess_module, "post", Postprocess())
+        (c.convert_preprocess_module, "preprocess"),
+        (c.convert_postprocess_module, "postprocess")
     ]
 )
-def test_convert_module_creates_onnx_file(fn, module_name, module, tmp_path):
-    onnx_path = fn(module, tmp_path, module_name)
-    assert onnx_path == tmp_path / module_name / "1" / "model.onnx"
+def test_convert_module_creates_onnx_file(fn, module_name, convert_spec, tmp_path):
+    onnx_path = fn(convert_spec, output_path=tmp_path)
+    assert onnx_path == tmp_path / f"{module_name}_{convert_spec.name}" / "1" / "model.onnx"
     assert onnx_path.is_file()
 
 
-def test_convert_preprocess_creates_correct_onnx_file(tmp_path):
-    module = Preprocess(mean=0.2860, std=0.3530)
-    img = (np.arange(4 * 28 * 28) % 256).astype(np.uint8).reshape(4, 1, 28, 28)
+def test_convert_preprocess_creates_correct_onnx_file(convert_spec, tmp_path):
+    module = Preprocess(mean=convert_spec.mean, std=convert_spec.std)
+    img = (np.arange(4 * 28 * 28) % 256).astype(np.uint8).reshape(4, *convert_spec.input_shape)
 
-    onnx_path = c.convert_preprocess_module(module, tmp_path, "pre")
+    onnx_path = c.convert_preprocess_module(convert_spec, output_path=tmp_path)
     sess = ort.InferenceSession(onnx_path)
     onnx_out = sess.run(None, {"input": img})[0]
 
@@ -41,13 +40,13 @@ def test_convert_preprocess_creates_correct_onnx_file(tmp_path):
     np.testing.assert_allclose(onnx_out, torch_out, rtol=1e-6, atol=1e-6)
 
 
-def test_convert_model_creates_correct_onnx_file(model_path, tmp_path):
-    model = CNN(in_channels=1, n_classes=10)
+def test_convert_model_creates_correct_onnx_file(convert_spec, model_path, tmp_path):
+    model = CNN(in_channels=convert_spec.input_shape[0], n_classes=convert_spec.n_classes)
     model.load_state_dict(torch.load(model_path))
     model.eval()
-    img = torch.randn(4, 1, 28, 28)
+    img = torch.randn(4, *convert_spec.input_shape)
 
-    onnx_path = c.convert_model(model_path, output_path=tmp_path, model_name="test_model")
+    onnx_path = c.convert_model(model_path, convert_spec, output_path=tmp_path)
     sess = ort.InferenceSession(onnx_path)
     onnx_out = sess.run(None, {"input": img.numpy()})[0]
 
@@ -57,11 +56,11 @@ def test_convert_model_creates_correct_onnx_file(model_path, tmp_path):
     np.testing.assert_allclose(onnx_out, torch_out, rtol=1e-5, atol=1e-5)
 
 
-def test_convert_postprocess_creates_correct_onnx_file(tmp_path):
+def test_convert_postprocess_creates_correct_onnx_file(convert_spec, tmp_path):
     module = Postprocess()
-    pred = torch.randn(4, 10)
+    pred = torch.randn(4, convert_spec.n_classes)
 
-    onnx_path = c.convert_postprocess_module(module, tmp_path, "post")
+    onnx_path = c.convert_postprocess_module(convert_spec, tmp_path)
     sess = ort.InferenceSession(onnx_path)
     onnx_cls, onnx_conf = sess.run(None, {"logits": pred.numpy()})
     with torch.no_grad():
