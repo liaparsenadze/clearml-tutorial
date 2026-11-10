@@ -1,5 +1,5 @@
 {
-  "model_id": "123",
+  "model_id": "c009ce06f7704dc3b65afc3c798ea91d",
   "name": "fashion-v1",
   "input_shape": [1, 28, 28]
 }

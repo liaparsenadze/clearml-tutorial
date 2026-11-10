@@ -56,6 +56,8 @@ def generate_ensemble_config(spec: ConvertSpec, output_path: Path):
     pb = json_format.ParseDict(config.model_dump(), ModelConfig())
     pbtxt = text_format.MessageToString(pb, use_short_repeated_primitives=True)
     (output_path / f"ensemble_{spec.name}/1").mkdir(parents=True, exist_ok=True)
+    (output_path / f"ensemble_{spec.name}" / "1" / ".keep").touch()
+
 
     with open(output_path / f"ensemble_{spec.name}/config.pbtxt", "w") as f:
         f.write(pbtxt)
