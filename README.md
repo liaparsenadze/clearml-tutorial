@@ -19,9 +19,10 @@ automatically, on a local Docker Compose stack (MinIO stands in for S3).
 ## Next (Phase 3)
 
 - [x] `src/deploy.py`: `model_id` → Triton model repository artifact (works locally)
-- [ ] ML image: Dockerfile with locked deps from `pyproject.toml` / `uv.lock` (fixes missing `tritonclient[grpc]` on the agent)
-- [ ] Agent in Docker mode; tasks pick their image via `task.set_base_docker(...)`
-- [ ] Run `deploy.py -q default` on the agent
+- [x] ML image: Dockerfile with locked deps from `pyproject.toml` / `uv.lock` (fixes missing `tritonclient[grpc]` on the agent)
+- [x] Agent in Docker mode (socket mount, compose network, host mount)
+- [x] Deploy task runs on the agent inside `clearml-tutorial:v1` (image set in the UI)
+- [ ] `setup_task` sets the image via `task.set_base_docker(...)` instead of the UI
 - [ ] Triton check step: fetch `model_repository`, start `tritonserver`, run the check, fail on error
 - [ ] Wire both steps into a `PipelineDecorator` pipeline
 - Later: local container registry (stand-in for ECR)
@@ -36,4 +37,5 @@ automatically, on a local Docker Compose stack (MinIO stands in for S3).
 ## Running locally
 
 - Always `export CLEARML_CONFIG_FILE="$PWD/clearml.conf"` (otherwise `~/clearml.conf` is used)
+- Build the task image after dependency changes: `docker build -t clearml-tutorial:v<N> .` (bump the tag; the agent uses the local image, no registry)
 - `/etc/hosts` needs `127.0.0.1 minio`; `clearml.conf` uses `minio:9000`, same as the agent

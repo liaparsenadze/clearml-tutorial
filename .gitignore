@@ -183,3 +183,5 @@ cython_debug/
 clearml.conf
 # local session notes
 HANDOFF.md
+# local data and model repository
+fashion_mnist_data/
