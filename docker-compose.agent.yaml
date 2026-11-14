@@ -3,7 +3,7 @@ services:
     networks:
       - backend
     container_name: clearml-agent
-    image: python:3.12
+    image: clearml/clearml-agent-services:latest
     depends_on:
       - apiserver
     restart: unless-stopped
@@ -18,6 +18,9 @@ services:
       CLEARML_AGENT_GIT_PASS: ${CLEARML_AGENT_GIT_PASS}
       MINIO_AGENT_KEY: ${MINIO_AGENT_KEY}
       MINIO_AGENT_SECRET: ${MINIO_AGENT_SECRET}
+      CLEARML_AGENT_DOCKER_HOST_MOUNT: "/opt/clearml/agent-default:/root/.clearml"
     volumes:
       - ./deploy-clearml.conf:/root/clearml.conf
-    command: sh -c "pip install clearml-agent && clearml-agent daemon --queue default"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/clearml/agent-default:/root/.clearml
+    entrypoint: sh -c "curl --retry 10 --retry-delay 10 --retry-connrefused 'http://apiserver:8008/debug.ping' && clearml-agent daemon --docker --cpu-only --queue default"

@@ -34,7 +34,7 @@ services:
       CLEARML__secure__credentials__services_agent__user_key: ${CLEARML_AGENT_ACCESS_KEY:-}
       CLEARML__secure__credentials__services_agent__user_secret: ${CLEARML_AGENT_SECRET_KEY:-}
     ports:
-    - "8008:8008"
+    - "127.0.0.1:8008:8008"
     networks:
       - backend
       - frontend
@@ -84,7 +84,7 @@ services:
     - /opt/clearml/data/fileserver:/mnt/fileserver
     - /opt/clearml/config:/opt/clearml/config
     ports:
-    - "8081:8081"
+    - "127.0.0.1:8081:8081"
 
   mongo:
     networks:
@@ -117,7 +117,7 @@ services:
     depends_on:
       - apiserver
     ports:
-    - "8080:80"
+    - "127.0.0.1:8080:80"
     networks:
       - backend
       - frontend
