@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from convert import _Dim, DataType, ConvertSpec
+from deployment.convert import _Dim, DataType, ConvertSpec
 from pathlib import Path
 from google.protobuf import text_format, json_format
 from tritonclient.grpc.model_config_pb2 import ModelConfig

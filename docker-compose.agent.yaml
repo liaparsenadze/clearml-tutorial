@@ -23,4 +23,4 @@ services:
       - ./deploy-clearml.conf:/root/clearml.conf
       - /var/run/docker.sock:/var/run/docker.sock
       - /opt/clearml/agent-default:/root/.clearml
-    entrypoint: sh -c "curl --retry 10 --retry-delay 10 --retry-connrefused 'http://apiserver:8008/debug.ping' && clearml-agent daemon --docker --cpu-only --queue default"
+    entrypoint: sh -c "curl --retry 10 --retry-delay 10 --retry-connrefused 'http://apiserver:8008/debug.ping' && clearml-agent daemon --docker clearml-tutorial:v1 --cpu-only --queue default"

@@ -3,9 +3,9 @@ from pathlib import Path
 
 from clearml import Model
 from utils import parse_arguments, setup_task
-import convert as c
-from triton_ensemble import generate_ensemble_config
-from convert import ConvertSpec
+import deployment.convert as c
+from deployment.triton_ensemble import generate_ensemble_config
+from deployment.convert import ConvertSpec
 import json
 
 

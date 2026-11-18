@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from enum import StrEnum
 from google.protobuf import text_format, json_format
 from tritonclient.grpc.model_config_pb2 import ModelConfig
-from deploy_processors import Preprocess, Postprocess
+from deployment.deploy_processors import Preprocess, Postprocess
 
 
 class ConvertSpec(BaseModel):
