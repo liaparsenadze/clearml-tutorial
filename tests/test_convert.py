@@ -1,9 +1,9 @@
 import pytest
 import numpy as np
 import torch
-import convert as c
+import deployment.convert as c
 import onnxruntime as ort
-from deploy_processors import Preprocess, Postprocess
+from deployment.deploy_processors import Preprocess, Postprocess
 from model import CNN
 
 

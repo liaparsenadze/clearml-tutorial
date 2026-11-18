@@ -2,7 +2,7 @@ import pytest
 import torch
 import torchvision.io as io
 from model import CNN
-from convert import ConvertSpec
+from deployment.convert import ConvertSpec
 
 
 @pytest.fixture

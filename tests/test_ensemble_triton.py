@@ -1,9 +1,9 @@
 import tritonclient.http as httpclient
 from PIL import Image
-from convert import ConvertSpec
+from deployment.convert import ConvertSpec
 import pytest
 
-from deploy_processors import Postprocess, Preprocess
+from deployment.deploy_processors import Postprocess, Preprocess
 from model import CNN
 import torch
 import numpy as np
